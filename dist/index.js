@@ -101,8 +101,8 @@ function initialize() {
             var color = getRandomColor();
             var x = getRandomNumber(r, getCanvasWidth(canvas) - r);
             var y = getRandomNumber(r, getCanvasHeight(canvas) - r);
-            var dx = getRandomNumber(-2, 2) || 1;
-            var dy = getRandomNumber(-2, 2) || 1;
+            var dx = getRandomNumber(-2, 2) || (Math.random() < 0.5 ? getRandomNumber(-0.1, -4) : getRandomNumber(0.1, 4));
+            var dy = getRandomNumber(-2, 2) || (Math.random() < 0.5 ? getRandomNumber(-0.1, -4) : getRandomNumber(0.1, 4));
             var circle = new Circle(context, x, y, r, dx, dy, color);
             store.circles.push(circle);
             circle.draw();

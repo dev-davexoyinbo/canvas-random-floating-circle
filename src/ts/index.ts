@@ -168,8 +168,8 @@ function initialize() {
       const color = getRandomColor();
       const x = getRandomNumber(r, getCanvasWidth(canvas) - r);
       const y = getRandomNumber(r, getCanvasHeight(canvas) - r);
-      const dx = getRandomNumber(-2, 2) || 1;
-      const dy = getRandomNumber(-2, 2) || 1;
+      const dx = getRandomNumber(-2, 2) || (Math.random() < 0.5 ? getRandomNumber(-0.1, -4) : getRandomNumber(0.1, 4));
+      const dy = getRandomNumber(-2, 2) || (Math.random() < 0.5 ? getRandomNumber(-0.1, -4) : getRandomNumber(0.1, 4));
       const circle = new Circle(context, x, y, r, dx, dy, color);
       store.circles.push(circle);
       circle.draw();
@@ -193,6 +193,7 @@ canvas.addEventListener("mousemove", (event) => {
     y: event.clientY,
   });
 });
+
 canvas.addEventListener("mouseleave", (event) => {
   Object.assign(store.mousePosition, {
     x: undefined,
