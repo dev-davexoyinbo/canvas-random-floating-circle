@@ -7,6 +7,7 @@ var store = {
         y: undefined,
     },
 };
+var DEVICE_DPI_RATIO = (window.devicePixelRatio || 1);
 console.log("This is the index page");
 var Circle = (function () {
     function Circle(context, x, y, r, dx, dy, color) {
@@ -23,6 +24,7 @@ var Circle = (function () {
     Circle.prototype.draw = function () {
         this.context.beginPath();
         this.context.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+        this.context.lineWidth = 1;
         this.context.strokeStyle = this.color;
         this.context.stroke();
         this.context.fillStyle = this.shouldFill ? this.color : "transparent";
@@ -33,13 +35,13 @@ var Circle = (function () {
             x: this.x + this.dx,
             y: this.y + this.dy,
         });
-        if (this.x + this.r >= this.context.canvas.width) {
+        if (this.x + this.r >= getCanvasWidth(canvas)) {
             this.dx = Math.abs(this.dx) * -1;
         }
         else if (this.x - this.r <= 0) {
             this.dx = Math.abs(this.dx);
         }
-        if (this.y + this.r >= this.context.canvas.height) {
+        if (this.y + this.r >= getCanvasHeight(canvas)) {
             this.dy = Math.abs(this.dy) * -1;
         }
         else if (this.y - this.r <= 0) {
@@ -68,22 +70,32 @@ var context = canvas.getContext("2d");
 window.addEventListener("resize", function () { return setCanvasToFullScreen(canvas); });
 setCanvasToFullScreen(canvas);
 function setCanvasSize(canvas, width, height) {
-    canvas.width = width;
-    canvas.height = height;
+    var context = canvas.getContext("2d");
+    canvas.width = width * DEVICE_DPI_RATIO;
+    canvas.height = height * DEVICE_DPI_RATIO;
+    context === null || context === void 0 ? void 0 : context.scale(DEVICE_DPI_RATIO, DEVICE_DPI_RATIO);
+    canvas.style.width = "".concat(width, "px");
+    canvas.style.height = "".concat(height, "px");
+}
+function getCanvasWidth(canvas) {
+    return canvas.getBoundingClientRect().width;
+}
+function getCanvasHeight(canvas) {
+    return canvas.getBoundingClientRect().height;
 }
 function setCanvasToFullScreen(canvas) {
     setCanvasSize(canvas, window.innerWidth, window.innerHeight);
     initialize();
 }
 function initialize() {
-    var area = canvas.width * canvas.height;
+    var area = getCanvasWidth(canvas) * getCanvasHeight(canvas);
     var count = Math.floor(area * store.CIRCLE_DENSITY);
     if (count > store.circles.length) {
         for (var i = 0; i < count - store.circles.length; i++) {
             var r = 10 + Math.floor(Math.random() * 30);
             var color = "rgba(".concat(Math.floor(Math.random() * 256), ", ").concat(Math.floor(Math.random() * 256), ", ").concat(Math.floor(Math.random() * 256), ", ").concat(0.5 + Math.random() * 0.5, ")");
-            var x = Math.random() * (canvas.width - r * 2) + r;
-            var y = Math.random() * (canvas.height - r * 2) + r;
+            var x = Math.random() * (getCanvasWidth(canvas) - r * 2) + r;
+            var y = Math.random() * (getCanvasHeight(canvas) - r * 2) + r;
             var dx = 1 + (Math.random() - 0.5) * 3;
             var dy = 1 + (Math.random() - 0.5) * 3;
             var circle = new Circle(context, x, y, r, dx, dy, color);

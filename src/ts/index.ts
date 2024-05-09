@@ -7,6 +7,8 @@ const store = {
   },
 };
 
+let DEVICE_DPI_RATIO = (window.devicePixelRatio || 1);
+
 console.log("This is the index page");
 
 class Circle {
@@ -46,6 +48,7 @@ class Circle {
   draw() {
     this.context.beginPath();
     this.context.arc(this.x, this.y, this.r, 0, Math.PI * 2, false);
+    this.context.lineWidth = 1;
     this.context.strokeStyle = this.color;
     this.context.stroke();
     this.context.fillStyle = this.shouldFill ? this.color : "transparent";
@@ -58,12 +61,12 @@ class Circle {
       y: this.y + this.dy,
     });
 
-    if (this.x + this.r >= this.context.canvas.width) {
+    if (this.x + this.r >= getCanvasWidth(canvas)) {
       this.dx = Math.abs(this.dx) * -1;
     } else if (this.x - this.r <= 0) {
       this.dx = Math.abs(this.dx);
     }
-    if (this.y + this.r >= this.context.canvas.height) {
+    if (this.y + this.r >= getCanvasHeight(canvas)) {
       this.dy = Math.abs(this.dy) * -1;
     } else if (this.y - this.r <= 0) {
       this.dy = Math.abs(this.dy);
@@ -120,9 +123,24 @@ function setCanvasSize(
   width: number,
   height: number
 ) {
-  canvas.width = width;
-  canvas.height = height;
+  const context = canvas.getContext("2d");
+
+  canvas.width = width * DEVICE_DPI_RATIO;
+  canvas.height = height * DEVICE_DPI_RATIO;
+
+  context?.scale(DEVICE_DPI_RATIO, DEVICE_DPI_RATIO);
+canvas.style.width = `${width}px`;
+canvas.style.height = `${height}px`;
 }
+
+function getCanvasWidth(canvas: HTMLCanvasElement) {
+    return canvas.getBoundingClientRect().width;
+}
+
+function getCanvasHeight(canvas: HTMLCanvasElement) {
+    return canvas.getBoundingClientRect().height;
+}
+
 
 /**
  *
@@ -134,7 +152,8 @@ function setCanvasToFullScreen(canvas: HTMLCanvasElement) {
 }
 
 function initialize() {
-  const area = canvas.width * canvas.height;
+
+  const area = getCanvasWidth(canvas) * getCanvasHeight(canvas);
   const count = Math.floor(area * store.CIRCLE_DENSITY);
 
   // store.circles = [];
@@ -144,8 +163,8 @@ function initialize() {
       const color = `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(
         Math.random() * 256
       )}, ${Math.floor(Math.random() * 256)}, ${0.5 + Math.random() * 0.5})`;
-      const x = Math.random() * (canvas.width - r * 2) + r;
-      const y = Math.random() * (canvas.height - r * 2) + r;
+      const x = Math.random() * (getCanvasWidth(canvas) - r * 2) + r;
+      const y = Math.random() * (getCanvasHeight(canvas) - r * 2) + r;
       const dx = 1 + (Math.random() - 0.5) * 3;
       const dy = 1 + (Math.random() - 0.5) * 3;
       const circle = new Circle(context, x, y, r, dx, dy, color);
