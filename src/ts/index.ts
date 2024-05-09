@@ -7,9 +7,7 @@ const store = {
   },
 };
 
-let DEVICE_DPI_RATIO = (window.devicePixelRatio || 1);
-
-console.log("This is the index page");
+let DEVICE_DPI_RATIO = window.devicePixelRatio || 1;
 
 class Circle {
   x: number;
@@ -129,18 +127,17 @@ function setCanvasSize(
   canvas.height = height * DEVICE_DPI_RATIO;
 
   context?.scale(DEVICE_DPI_RATIO, DEVICE_DPI_RATIO);
-canvas.style.width = `${width}px`;
-canvas.style.height = `${height}px`;
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
 }
 
 function getCanvasWidth(canvas: HTMLCanvasElement) {
-    return canvas.getBoundingClientRect().width;
+  return canvas.getBoundingClientRect().width;
 }
 
 function getCanvasHeight(canvas: HTMLCanvasElement) {
-    return canvas.getBoundingClientRect().height;
+  return canvas.getBoundingClientRect().height;
 }
-
 
 /**
  *
@@ -151,22 +148,28 @@ function setCanvasToFullScreen(canvas: HTMLCanvasElement) {
   initialize();
 }
 
-function initialize() {
+function getRandomNumber(min: number, max: number) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
 
+function getRandomColor() {
+  return `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(
+    Math.random() * 256
+  )}, ${Math.floor(Math.random() * 256)}, ${0.5 + Math.random() * 0.5})`;
+}
+
+function initialize() {
   const area = getCanvasWidth(canvas) * getCanvasHeight(canvas);
   const count = Math.floor(area * store.CIRCLE_DENSITY);
 
-  // store.circles = [];
   if (count > store.circles.length) {
     for (let i = 0; i < count - store.circles.length; i++) {
-      const r = 10 + Math.floor(Math.random() * 30);
-      const color = `rgba(${Math.floor(Math.random() * 256)}, ${Math.floor(
-        Math.random() * 256
-      )}, ${Math.floor(Math.random() * 256)}, ${0.5 + Math.random() * 0.5})`;
-      const x = Math.random() * (getCanvasWidth(canvas) - r * 2) + r;
-      const y = Math.random() * (getCanvasHeight(canvas) - r * 2) + r;
-      const dx = 1 + (Math.random() - 0.5) * 3;
-      const dy = 1 + (Math.random() - 0.5) * 3;
+      const r = getRandomNumber(10, 30);
+      const color = getRandomColor();
+      const x = getRandomNumber(r, getCanvasWidth(canvas) - r);
+      const y = getRandomNumber(r, getCanvasHeight(canvas) - r);
+      const dx = getRandomNumber(-2, 2) || 1;
+      const dy = getRandomNumber(-2, 2) || 1;
       const circle = new Circle(context, x, y, r, dx, dy, color);
       store.circles.push(circle);
       circle.draw();

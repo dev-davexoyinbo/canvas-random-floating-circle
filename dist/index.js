@@ -7,8 +7,7 @@ var store = {
         y: undefined,
     },
 };
-var DEVICE_DPI_RATIO = (window.devicePixelRatio || 1);
-console.log("This is the index page");
+var DEVICE_DPI_RATIO = window.devicePixelRatio || 1;
 var Circle = (function () {
     function Circle(context, x, y, r, dx, dy, color) {
         this.x = x;
@@ -87,17 +86,23 @@ function setCanvasToFullScreen(canvas) {
     setCanvasSize(canvas, window.innerWidth, window.innerHeight);
     initialize();
 }
+function getRandomNumber(min, max) {
+    return Math.floor(Math.random() * (max - min) + min);
+}
+function getRandomColor() {
+    return "rgba(".concat(Math.floor(Math.random() * 256), ", ").concat(Math.floor(Math.random() * 256), ", ").concat(Math.floor(Math.random() * 256), ", ").concat(0.5 + Math.random() * 0.5, ")");
+}
 function initialize() {
     var area = getCanvasWidth(canvas) * getCanvasHeight(canvas);
     var count = Math.floor(area * store.CIRCLE_DENSITY);
     if (count > store.circles.length) {
         for (var i = 0; i < count - store.circles.length; i++) {
-            var r = 10 + Math.floor(Math.random() * 30);
-            var color = "rgba(".concat(Math.floor(Math.random() * 256), ", ").concat(Math.floor(Math.random() * 256), ", ").concat(Math.floor(Math.random() * 256), ", ").concat(0.5 + Math.random() * 0.5, ")");
-            var x = Math.random() * (getCanvasWidth(canvas) - r * 2) + r;
-            var y = Math.random() * (getCanvasHeight(canvas) - r * 2) + r;
-            var dx = 1 + (Math.random() - 0.5) * 3;
-            var dy = 1 + (Math.random() - 0.5) * 3;
+            var r = getRandomNumber(10, 30);
+            var color = getRandomColor();
+            var x = getRandomNumber(r, getCanvasWidth(canvas) - r);
+            var y = getRandomNumber(r, getCanvasHeight(canvas) - r);
+            var dx = getRandomNumber(-2, 2) || 1;
+            var dy = getRandomNumber(-2, 2) || 1;
             var circle = new Circle(context, x, y, r, dx, dy, color);
             store.circles.push(circle);
             circle.draw();
