@@ -1,10 +1,11 @@
 "use strict";
 var store = {
     circles: [],
+    CIRCLE_DENSITY: 0.0005,
     mousePosition: {
         x: undefined,
-        y: undefined
-    }
+        y: undefined,
+    },
 };
 console.log("This is the index page");
 var Circle = (function () {
@@ -30,21 +31,23 @@ var Circle = (function () {
     Circle.prototype.update = function () {
         Object.assign(this, {
             x: this.x + this.dx,
-            y: this.y + this.dy
+            y: this.y + this.dy,
         });
-        if ((this.x + this.r) >= this.context.canvas.width) {
+        if (this.x + this.r >= this.context.canvas.width) {
             this.dx = Math.abs(this.dx) * -1;
         }
-        else if ((this.x - this.r) <= 0) {
+        else if (this.x - this.r <= 0) {
             this.dx = Math.abs(this.dx);
         }
-        if ((this.y + this.r) >= this.context.canvas.height) {
+        if (this.y + this.r >= this.context.canvas.height) {
             this.dy = Math.abs(this.dy) * -1;
         }
-        else if ((this.y - this.r) <= 0) {
+        else if (this.y - this.r <= 0) {
             this.dy = Math.abs(this.dy);
         }
-        var distanceToMouse = store.mousePosition.x === undefined || store.mousePosition.y === undefined ? Infinity : Math.hypot(this.x - store.mousePosition.x, this.y - store.mousePosition.y);
+        var distanceToMouse = store.mousePosition.x === undefined || store.mousePosition.y === undefined
+            ? Infinity
+            : Math.hypot(this.x - store.mousePosition.x, this.y - store.mousePosition.y);
         if (distanceToMouse < 100 && this.r < 200) {
             this.r += 1;
             this.shouldFill = true;
@@ -70,18 +73,26 @@ function setCanvasSize(canvas, width, height) {
 }
 function setCanvasToFullScreen(canvas) {
     setCanvasSize(canvas, window.innerWidth, window.innerHeight);
+    initialize();
 }
 function initialize() {
-    for (var i = 0; i < 200; i++) {
-        var r = 10 + Math.floor(Math.random() * 30);
-        var color = "rgba(".concat(Math.floor(Math.random() * 256), ", ").concat(Math.floor(Math.random() * 256), ", ").concat(Math.floor(Math.random() * 256), ", ").concat(0.5 + Math.random() * 0.5, ")");
-        var x = Math.random() * (canvas.width - r * 2) + r;
-        var y = Math.random() * (canvas.height - r * 2) + r;
-        var dx = 1 + (Math.random() - 0.5) * 3;
-        var dy = 1 + (Math.random() - 0.5) * 3;
-        var circle = new Circle(context, x, y, r, dx, dy, color);
-        store.circles.push(circle);
-        circle.draw();
+    var area = canvas.width * canvas.height;
+    var count = Math.floor(area * store.CIRCLE_DENSITY);
+    if (count > store.circles.length) {
+        for (var i = 0; i < count - store.circles.length; i++) {
+            var r = 10 + Math.floor(Math.random() * 30);
+            var color = "rgba(".concat(Math.floor(Math.random() * 256), ", ").concat(Math.floor(Math.random() * 256), ", ").concat(Math.floor(Math.random() * 256), ", ").concat(0.5 + Math.random() * 0.5, ")");
+            var x = Math.random() * (canvas.width - r * 2) + r;
+            var y = Math.random() * (canvas.height - r * 2) + r;
+            var dx = 1 + (Math.random() - 0.5) * 3;
+            var dy = 1 + (Math.random() - 0.5) * 3;
+            var circle = new Circle(context, x, y, r, dx, dy, color);
+            store.circles.push(circle);
+            circle.draw();
+        }
+    }
+    else {
+        store.circles = store.circles.slice(0, count);
     }
 }
 function animate() {
