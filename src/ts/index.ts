@@ -24,6 +24,8 @@ const store = {
   latestCanvasRect: undefined as DOMRect | undefined,
 };
 
+const rootStyle = document.documentElement;
+
 const DEVICE_DPI_RATIO = window.devicePixelRatio || 1;
 
 class Circle {
@@ -114,8 +116,6 @@ class Circle {
 
 
 
-window.addEventListener("resize", () => setCanvasToFullScreen(canvas));
-setCanvasToFullScreen(canvas);
 
 /**
  * Sets the size of the canvas element.
@@ -204,7 +204,7 @@ window.addEventListener("mousemove", (event) => {
     x = undefined;
     y = undefined;
   }
-  
+
   Object.assign(store.mousePosition, {
     x,
     y,
@@ -218,6 +218,11 @@ canvas.addEventListener("mouseleave", (event) => {
   });
 });
 
+window.addEventListener("resize", () => {
+  rootStyle.style.setProperty("--viewport-height", `${window.innerHeight}px`);
+  setCanvasToFullScreen(canvas)
+});
+setCanvasToFullScreen(canvas);
 
 
 initialize();

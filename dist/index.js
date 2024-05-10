@@ -10,6 +10,7 @@ var store = {
     },
     latestCanvasRect: undefined,
 };
+var rootStyle = document.documentElement;
 var DEVICE_DPI_RATIO = window.devicePixelRatio || 1;
 var Circle = (function () {
     function Circle(context, x, y, r, dx, dy, color) {
@@ -69,8 +70,6 @@ var Circle = (function () {
     };
     return Circle;
 }());
-window.addEventListener("resize", function () { return setCanvasToFullScreen(canvas); });
-setCanvasToFullScreen(canvas);
 function setCanvasSize(canvas, width, height) {
     var context = canvas.getContext("2d");
     canvas.width = width * DEVICE_DPI_RATIO;
@@ -141,5 +140,10 @@ canvas.addEventListener("mouseleave", function (event) {
         y: undefined,
     });
 });
+window.addEventListener("resize", function () {
+    rootStyle.style.setProperty("--viewport-height", "".concat(window.innerHeight, "px"));
+    setCanvasToFullScreen(canvas);
+});
+setCanvasToFullScreen(canvas);
 initialize();
 animate();
