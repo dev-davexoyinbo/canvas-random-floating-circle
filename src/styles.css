@@ -16,6 +16,8 @@ html,
     background-color: lightcyan;
     box-sizing: border-box;
     position: absolute;
+    top: 0;
+    left: 0;
     z-index: 0;
 }
 
