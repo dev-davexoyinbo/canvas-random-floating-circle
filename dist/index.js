@@ -1,7 +1,7 @@
 "use strict";
 var store = {
     circles: [],
-    CIRCLE_DENSITY: 0.0005,
+    CIRCLE_DENSITY: 0.00015,
     mousePosition: {
         x: undefined,
         y: undefined,
@@ -103,7 +103,7 @@ function initialize() {
             var y = getRandomNumber(r, getCanvasHeight(canvas) - r);
             var dx = getRandomNumber(-2, 2) || (Math.random() < 0.5 ? getRandomNumber(-0.1, -4) : getRandomNumber(0.1, 4));
             var dy = getRandomNumber(-2, 2) || (Math.random() < 0.5 ? getRandomNumber(-0.1, -4) : getRandomNumber(0.1, 4));
-            var circle = new Circle(context, x, y, r, dx, dy, color);
+            var circle = new Circle(context, x, y, r, dx * 0.5, dy * 0.5, color);
             store.circles.push(circle);
             circle.draw();
         }

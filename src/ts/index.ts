@@ -1,6 +1,6 @@
 const store = {
   circles: [] as Circle[],
-  CIRCLE_DENSITY: 0.0005,
+  CIRCLE_DENSITY: 0.00015,
   mousePosition: {
     x: undefined,
     y: undefined,
@@ -170,7 +170,7 @@ function initialize() {
       const y = getRandomNumber(r, getCanvasHeight(canvas) - r);
       const dx = getRandomNumber(-2, 2) || (Math.random() < 0.5 ? getRandomNumber(-0.1, -4) : getRandomNumber(0.1, 4));
       const dy = getRandomNumber(-2, 2) || (Math.random() < 0.5 ? getRandomNumber(-0.1, -4) : getRandomNumber(0.1, 4));
-      const circle = new Circle(context, x, y, r, dx, dy, color);
+      const circle = new Circle(context, x, y, r, dx * 0.5, dy * 0.5, color);
       store.circles.push(circle);
       circle.draw();
     }
