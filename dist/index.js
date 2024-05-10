@@ -1,4 +1,6 @@
 "use strict";
+var canvas = document.querySelector(".canvas");
+var context = canvas.getContext("2d");
 var store = {
     circles: [],
     CIRCLE_DENSITY: 0.00015,
@@ -6,6 +8,7 @@ var store = {
         x: undefined,
         y: undefined,
     },
+    latestCanvasRect: undefined,
 };
 var DEVICE_DPI_RATIO = window.devicePixelRatio || 1;
 var Circle = (function () {
@@ -46,9 +49,11 @@ var Circle = (function () {
         else if (this.y - this.r <= 0) {
             this.dy = Math.abs(this.dy);
         }
-        var distanceToMouse = store.mousePosition.x === undefined || store.mousePosition.y === undefined
-            ? Infinity
-            : Math.hypot(this.x - store.mousePosition.x, this.y - store.mousePosition.y);
+        var distanceToMouse = Infinity;
+        if (!(store.mousePosition.x === undefined || store.mousePosition.y === undefined)) {
+            var rect = this.context.canvas.getBoundingClientRect();
+            distanceToMouse = Math.hypot(this.x - (store.mousePosition.x - rect.x), this.y - (store.mousePosition.y - rect.y));
+        }
         if (distanceToMouse < 100 && this.r < 200) {
             this.r += 1;
             this.shouldFill = true;
@@ -64,8 +69,6 @@ var Circle = (function () {
     };
     return Circle;
 }());
-var canvas = document.querySelector(".canvas");
-var context = canvas.getContext("2d");
 window.addEventListener("resize", function () { return setCanvasToFullScreen(canvas); });
 setCanvasToFullScreen(canvas);
 function setCanvasSize(canvas, width, height) {
@@ -119,10 +122,17 @@ function animate() {
     }
     requestAnimationFrame(animate);
 }
-canvas.addEventListener("mousemove", function (event) {
+window.addEventListener("mousemove", function (event) {
+    var rect = canvas.getBoundingClientRect();
+    var x = event.clientX;
+    var y = event.clientY;
+    if (!(rect.left < x && x < rect.right && rect.top < y && y < rect.bottom)) {
+        x = undefined;
+        y = undefined;
+    }
     Object.assign(store.mousePosition, {
-        x: event.clientX,
-        y: event.clientY,
+        x: x,
+        y: y,
     });
 });
 canvas.addEventListener("mouseleave", function (event) {
@@ -130,7 +140,6 @@ canvas.addEventListener("mouseleave", function (event) {
         x: undefined,
         y: undefined,
     });
-    console.log("mouse leave");
 });
 initialize();
 animate();

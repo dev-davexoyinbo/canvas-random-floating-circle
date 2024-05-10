@@ -1,3 +1,19 @@
+/**
+ * Canvas element for drawing
+ * @type {HTMLCanvasElement}
+ */
+const canvas: HTMLCanvasElement = document.querySelector(
+  ".canvas"
+) as HTMLCanvasElement;
+
+/**
+ * 2D rendering context for the canvas
+ * @type {CanvasRenderingContext2D}
+ */
+const context: CanvasRenderingContext2D = canvas.getContext(
+  "2d"
+) as CanvasRenderingContext2D;
+
 const store = {
   circles: [] as Circle[],
   CIRCLE_DENSITY: 0.00015,
@@ -5,9 +21,10 @@ const store = {
     x: undefined,
     y: undefined,
   },
+  latestCanvasRect: undefined as DOMRect | undefined,
 };
 
-let DEVICE_DPI_RATIO = window.devicePixelRatio || 1;
+const DEVICE_DPI_RATIO = window.devicePixelRatio || 1;
 
 class Circle {
   x: number;
@@ -70,13 +87,17 @@ class Circle {
       this.dy = Math.abs(this.dy);
     }
 
-    const distanceToMouse =
-      store.mousePosition.x === undefined || store.mousePosition.y === undefined
-        ? Infinity
-        : Math.hypot(
-            this.x - store.mousePosition.x,
-            this.y - store.mousePosition.y
-          );
+    let distanceToMouse = Infinity;
+
+    if( !(store.mousePosition.x === undefined || store.mousePosition.y === undefined)) {
+      const rect = this.context.canvas.getBoundingClientRect();
+
+      distanceToMouse = Math.hypot(
+        this.x - (store.mousePosition.x - rect.x),
+        this.y - (store.mousePosition.y - rect.y)
+      );
+    }
+
     if (distanceToMouse < 100 && this.r < 200) {
       this.r += 1;
       this.shouldFill = true;
@@ -91,20 +112,7 @@ class Circle {
   }
 }
 
-/**
- * Canvas element for drawing
- * @type {HTMLCanvasElement}
- */
-const canvas: HTMLCanvasElement = document.querySelector(
-  ".canvas"
-) as HTMLCanvasElement;
-/**
- * 2D rendering context for the canvas
- * @type {CanvasRenderingContext2D}
- */
-const context: CanvasRenderingContext2D = canvas.getContext(
-  "2d"
-) as CanvasRenderingContext2D;
+
 
 window.addEventListener("resize", () => setCanvasToFullScreen(canvas));
 setCanvasToFullScreen(canvas);
@@ -187,10 +195,19 @@ function animate() {
   requestAnimationFrame(animate);
 }
 
-canvas.addEventListener("mousemove", (event) => {
+window.addEventListener("mousemove", (event) => {
+  const rect = canvas.getBoundingClientRect();
+  let x: undefined | number = event.clientX;
+  let y: undefined | number = event.clientY;
+
+  if(!(rect.left < x && x < rect.right && rect.top < y && y < rect.bottom)) {
+    x = undefined;
+    y = undefined;
+  }
+  
   Object.assign(store.mousePosition, {
-    x: event.clientX,
-    y: event.clientY,
+    x,
+    y,
   });
 });
 
@@ -199,9 +216,9 @@ canvas.addEventListener("mouseleave", (event) => {
     x: undefined,
     y: undefined,
   });
-
-  console.log("mouse leave");
 });
+
+
 
 initialize();
 animate();
